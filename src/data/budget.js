@@ -68,6 +68,12 @@ const september2026 = {
       note: '4 раза × ~6 000 ₽ на двоих',
     },
     {
+      id: 'gym-sasha',
+      group: 'sport',
+      name: 'Тренировки в зале',
+      amount: 20_000,
+    },
+    {
       id: 'utils',
       group: 'home',
       name: 'Коммуналка и связь',

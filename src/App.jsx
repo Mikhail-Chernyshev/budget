@@ -101,7 +101,7 @@ function MonthView({ data, period }) {
   const free = data.income - spend - data.savings
   const maxBar = Math.max(...fundedItems.map((item) => item.amount), 1)
   const barTotal = Math.max(data.income, spend + data.savings, 1)
-  const taxiUnset = items.some((item) => item.open && item.amount == null)
+  const openUnset = items.filter((item) => item.open && item.amount == null)
   const cosmo = items.find((item) => item.planned)
   const composition = [
     { id: 'spend', label: 'Траты', value: spend, color: 'var(--neg)' },
@@ -160,7 +160,11 @@ function MonthView({ data, period }) {
         <article className={`card card--free${free < 0 ? ' is-negative' : ''}`}>
           <div className="card__label">Свободно</div>
           <div className="card__value">{formatRub(free)}</div>
-          {taxiUnset ? <div className="card__note">такси пока не вычтено</div> : null}
+          {openUnset.length > 0 ? (
+            <div className="card__note">
+              пока не вычтено: {openUnset.map((item) => item.name.toLowerCase()).join(', ')}
+            </div>
+          ) : null}
         </article>
       </div>
 

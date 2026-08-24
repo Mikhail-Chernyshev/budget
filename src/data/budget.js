@@ -18,12 +18,14 @@ export const MONTH_NAMES = [
 ]
 
 export const GROUPS = {
-  health: { label: 'Здоровье', color: '#2b74d9' },
+  medicine: { label: 'Медицина', color: '#2b74d9' },
+  beauty: { label: 'Красота', color: '#db5a8c' },
   sport: { label: 'Спорт', color: '#1f8a5a' },
   home: { label: 'Дом и связь', color: '#d97706' },
   food: { label: 'Еда', color: '#e07a4a' },
   transport: { label: 'Транспорт', color: '#7c5cde' },
   family: { label: 'Семья', color: '#c45c8a' },
+  leisure: { label: 'Досуг', color: '#0f9ea8' },
 }
 
 const september2026 = {
@@ -32,17 +34,24 @@ const september2026 = {
   items: [
     {
       id: 'therapy-misha',
-      group: 'health',
+      group: 'medicine',
       name: 'Терапия — Миша',
       amount: 6_000,
       note: '2 сессии',
     },
     {
       id: 'therapy-sasha',
-      group: 'health',
+      group: 'medicine',
       name: 'Терапия — Саша',
       amount: 18_000,
       note: '4 сессии',
+    },
+    {
+      id: 'medicine',
+      group: 'medicine',
+      name: 'Медицина',
+      amount: null,
+      open: true,
     },
     {
       id: 'tennis-wed',
@@ -73,7 +82,7 @@ const september2026 = {
     },
     {
       id: 'cosmo',
-      group: 'health',
+      group: 'beauty',
       name: 'Косметолог — Саша',
       amount: 35_000,
       planned: 60_000,
@@ -81,9 +90,16 @@ const september2026 = {
     },
     {
       id: 'nails',
-      group: 'health',
+      group: 'beauty',
       name: 'Маникюр и педикюр',
       amount: 10_000,
+    },
+    {
+      id: 'beauty',
+      group: 'beauty',
+      name: 'Красота',
+      amount: null,
+      open: true,
     },
     {
       id: 'food',
@@ -91,6 +107,20 @@ const september2026 = {
       name: 'Домашняя еда',
       amount: 35_000,
       note: 'около 35 000 ₽ в месяц',
+    },
+    {
+      id: 'restaurants',
+      group: 'food',
+      name: 'Рестораны',
+      amount: null,
+      open: true,
+    },
+    {
+      id: 'leisure',
+      group: 'leisure',
+      name: 'Досуг',
+      amount: null,
+      open: true,
     },
     {
       id: 'parents-visit',

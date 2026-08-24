@@ -47,6 +47,13 @@ const september2026 = {
       note: '4 сессии',
     },
     {
+      id: 'therapy-couple',
+      group: 'medicine',
+      name: 'Парная терапия',
+      amount: 16_000,
+      note: '2 сессии',
+    },
+    {
       id: 'medicine',
       group: 'medicine',
       name: 'Медицина',

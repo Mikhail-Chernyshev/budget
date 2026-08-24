@@ -122,18 +122,22 @@ const september2026 = {
       note: 'около 35 000 ₽ в месяц',
     },
     {
+      id: 'lunches',
+      group: 'food',
+      name: 'Обеды',
+      amount: 10_000,
+    },
+    {
       id: 'restaurants',
       group: 'food',
       name: 'Рестораны',
-      amount: null,
-      open: true,
+      amount: 30_000,
     },
     {
       id: 'leisure',
       group: 'leisure',
       name: 'Досуг',
-      amount: null,
-      open: true,
+      amount: 15_000,
     },
     {
       id: 'parents-visit',
@@ -145,8 +149,7 @@ const september2026 = {
       id: 'taxi',
       group: 'transport',
       name: 'Такси',
-      amount: null,
-      open: true,
+      amount: 20_000,
     },
   ],
 }

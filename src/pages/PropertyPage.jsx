@@ -9,6 +9,7 @@ import {
   STUDIO,
   getRussiaMortgage,
   neededIncome,
+  studioPaymentIncome,
 } from '../data/propertyPlan'
 import { formatCompactRub, formatEur, formatRub } from '../lib/money'
 
@@ -58,8 +59,9 @@ export function PropertyPage() {
   const ru = getRussiaMortgage(familyMortgage)
   const eu = MORTGAGES.europe
   const maxMonthly = Math.max(ru.monthly, eu.monthly)
-  const ruNeeded = neededIncome(ru.monthly, INCOME_RULES.russiaShare, dekret)
-  const euNeeded = neededIncome(eu.monthly, INCOME_RULES.europeShare, dekret)
+  const ruNeeded = neededIncome(ru.monthly, INCOME_RULES.russiaShare, false)
+  const euNeeded = neededIncome(eu.monthly, INCOME_RULES.europeShare, false)
+  const studioIncome = studioPaymentIncome(dekret)
 
   return (
     <>
@@ -92,10 +94,28 @@ export function PropertyPage() {
 
       <section className="panel">
         <h2>Шаг 1. Инвестиционная студия / однушка</h2>
-        <p className="panel-intro">
-          Поиск и сделка с ноября 2026 по апрель 2027. Цена {formatRub(STUDIO.price)}. На
-          контракте — первоначальный взнос, дальше три равных платежа раз в год.
-        </p>
+        <div className="panel-toolbar">
+          <p className="panel-intro">
+            Поиск и сделка с ноября 2026 по апрель 2027. Цена {formatRub(STUDIO.price)}. На
+            контракте — взнос из накоплений, дальше три равных платежа раз в год. Нужный доход
+            считаем от годового платежа рассрочки: не больше 50% дохода.
+          </p>
+          <label className="check-field">
+            <input
+              type="checkbox"
+              checked={dekret}
+              onChange={(event) => setDekret(event.target.checked)}
+            />
+            Декрет
+          </label>
+        </div>
+        {dekret ? (
+          <p className="dekret-note">
+            Декрет на {INCOME_RULES.dekretYears} года с апреля 2027: доход −40%. В этот период
+            попадают платежи апреля 2028 и 2029. Нужный доход до декрета выше в 1,67 раза, чтобы
+            после урезания всё ещё откладывать годовой платёж. Апрель 2030 — уже без декрета.
+          </p>
+        ) : null}
         <div className="cards cards--3">
           <article className="card">
             <div className="card__label">Цена</div>
@@ -121,15 +141,26 @@ export function PropertyPage() {
                 <th>На контракте</th>
                 <th>Остаток</th>
                 <th>Платёж раз в год × 3</th>
+                <th>Это в месяц</th>
+                <th>Нужный доход</th>
               </tr>
             </thead>
             <tbody>
-              {STUDIO.downOptions.map((option) => (
+              {studioIncome.map((option) => (
                 <tr key={option.down}>
                   <td>{formatCompactRub(option.down)}</td>
                   <td>{formatRub(option.down)}</td>
                   <td>{formatRub(option.rest)}</td>
                   <td>{formatRub(option.yearly)}</td>
+                  <td>{formatRub(option.monthly)}</td>
+                  <td>
+                    {formatRub(option.needed)}
+                    {dekret ? (
+                      <div className="table-sub">
+                        в 3-й год без декрета {formatRub(option.neededBase)}
+                      </div>
+                    ) : null}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -161,21 +192,7 @@ export function PropertyPage() {
             Кредит {formatRub(NEXT_HOME.loan)} ({formatEur(NEXT_HOME.loanEur)}) на 25 лет, взнос
             20%. Нужный доход: в России платёж не больше 50% дохода (ПДН), в Европе — около 35%.
           </p>
-          <label className="check-field">
-            <input
-              type="checkbox"
-              checked={dekret}
-              onChange={(event) => setDekret(event.target.checked)}
-            />
-            Декрет
-          </label>
         </div>
-        {dekret ? (
-          <p className="dekret-note">
-            Декрет на {INCOME_RULES.dekretYears} года режет доход на 40%, поэтому нужный доход
-            до декрета выше в 1,67 раза — чтобы после урезания нагрузка всё ещё проходила.
-          </p>
-        ) : null}
         <div className="mortgage-grid">
           <article className="mortgage-card mortgage-card--russia">
             <div className="mortgage-card__head">
@@ -215,9 +232,7 @@ export function PropertyPage() {
                 <dt>Нужный доход</dt>
                 <dd>{formatRub(ruNeeded)}</dd>
                 <dd className="mortgage-stats__sub">
-                  {dekret
-                    ? `с запасом на декрет −40% · ПДН 50% · ${formatEur(toEur(ruNeeded))}`
-                    : `ПДН до 50% · ${formatEur(toEur(ruNeeded))}`}
+                  ПДН до 50% · {formatEur(toEur(ruNeeded))}
                 </dd>
               </div>
             </dl>
@@ -265,9 +280,7 @@ export function PropertyPage() {
                 <dt>Нужный доход</dt>
                 <dd>{formatRub(euNeeded)}</dd>
                 <dd className="mortgage-stats__sub">
-                  {dekret
-                    ? `с запасом на декрет −40% · нагрузка 35% · ${formatEur(toEur(euNeeded))}`
-                    : `нагрузка до 35% · ${formatEur(toEur(euNeeded))}`}
+                  нагрузка до 35% · {formatEur(toEur(euNeeded))}
                 </dd>
               </div>
             </dl>

@@ -67,6 +67,18 @@ export function neededIncome(payment, share, dekret) {
   return Math.round(base / (1 - INCOME_RULES.dekretCut))
 }
 
+export function studioPaymentIncome(dekret) {
+  return STUDIO.downOptions.map((option) => {
+    const monthly = Math.round(option.yearly / 12)
+    return {
+      ...option,
+      monthly,
+      needed: neededIncome(monthly, INCOME_RULES.russiaShare, dekret),
+      neededBase: neededIncome(monthly, INCOME_RULES.russiaShare, false),
+    }
+  })
+}
+
 export const FAMILY_MORTGAGE = {
   rate: 6,
   marketRate: 17,

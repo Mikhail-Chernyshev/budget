@@ -57,6 +57,10 @@ export const INCOME_RULES = {
   dekretYears: 2,
 }
 
+export function requiredIncome(payment, share) {
+  return Math.round(payment / share)
+}
+
 export function neededIncome(payment, share, dekret) {
   const base = requiredIncome(payment, share)
   if (!dekret) return base

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { AmountInput } from './components/AmountInput'
 import {
   GROUPS,
   MAX_YEAR,
@@ -10,41 +11,32 @@ import {
   isPeriodAllowed,
 } from './data/budget'
 import { useStoredAmounts } from './hooks/useStoredAmounts'
+import { formatRub } from './lib/money'
+import { PropertyPage } from './pages/PropertyPage'
 import './App.css'
 
-const rub = new Intl.NumberFormat('ru-RU')
+function getPage() {
+  const hash = window.location.hash.replace(/^#\/?/, '')
+  return hash === 'property' ? 'property' : 'budget'
+}
 
-function formatRub(value) {
-  if (value == null) return '—'
-  return `${rub.format(value)} ₽`
+function usePage() {
+  const [page, setPage] = useState(getPage)
+
+  useEffect(() => {
+    function onHashChange() {
+      setPage(getPage())
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  return page
 }
 
 function shiftPeriod(year, month, delta) {
   const date = new Date(year, month - 1 + delta, 1)
   return { year: date.getFullYear(), month: date.getMonth() + 1 }
-}
-
-function parseAmount(text) {
-  const digits = text.replace(/\D/g, '')
-  if (digits === '') return null
-  return Number(digits.slice(0, 8))
-}
-
-function AmountInput({ value, onChange, label }) {
-  return (
-    <label className="amount-field">
-      <span className="visually-hidden">{label}</span>
-      <input
-        className="amount-input"
-        inputMode="numeric"
-        autoComplete="off"
-        placeholder="—"
-        value={value == null ? '' : rub.format(value)}
-        onChange={(event) => onChange(parseAmount(event.target.value))}
-      />
-      <span className="amount-field__suffix">₽</span>
-    </label>
-  )
 }
 
 function Donut({ slices, centerValue, centerLabel }) {
@@ -263,6 +255,7 @@ function MonthView({ data, period }) {
 }
 
 function App() {
+  const page = usePage()
   const [year, setYear] = useState(MIN_YEAR)
   const [month, setMonth] = useState(MIN_MONTH)
   const data = getMonthData(year, month)
@@ -282,62 +275,89 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1 className="header__title">Семейный бюджет</h1>
-        <div className="header__period">
-          <button
-            className="nav-btn"
-            type="button"
-            aria-label="Предыдущий месяц"
-            disabled={!canGoPrev}
-            onClick={() => go(-1)}
-          >
-            ‹
-          </button>
-          <select
-            className="select"
-            value={year}
-            onChange={(event) => {
-              const nextYear = Number(event.target.value)
-              setYear(nextYear)
-              if (!isPeriodAllowed(nextYear, month)) setMonth(MIN_MONTH)
+        <nav className="header__nav" aria-label="Разделы">
+          <a
+            className={`nav-link${page === 'budget' ? ' is-active' : ''}`}
+            href="#budget"
+            onClick={(event) => {
+              event.preventDefault()
+              window.location.hash = 'budget'
             }}
           >
-            {Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, index) => MIN_YEAR + index).map(
-              (value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ),
-            )}
-          </select>
-          <select
-            className="select"
-            value={month}
-            onChange={(event) => setMonth(Number(event.target.value))}
+            Бюджет
+          </a>
+          <a
+            className={`nav-link${page === 'property' ? ' is-active' : ''}`}
+            href="#property"
+            onClick={(event) => {
+              event.preventDefault()
+              window.location.hash = 'property'
+            }}
           >
-            {MONTH_NAMES.map((name, index) => {
-              const value = index + 1
-              return (
-                <option key={name} value={value} disabled={!isPeriodAllowed(year, value)}>
-                  {name}
-                </option>
-              )
-            })}
-          </select>
-          <button
-            className="nav-btn"
-            type="button"
-            aria-label="Следующий месяц"
-            disabled={!canGoNext}
-            onClick={() => go(1)}
-          >
-            ›
-          </button>
-        </div>
+            Покупка недвижимости
+          </a>
+        </nav>
+        {page === 'budget' ? (
+          <div className="header__period">
+            <button
+              className="nav-btn"
+              type="button"
+              aria-label="Предыдущий месяц"
+              disabled={!canGoPrev}
+              onClick={() => go(-1)}
+            >
+              ‹
+            </button>
+            <select
+              className="select"
+              value={year}
+              onChange={(event) => {
+                const nextYear = Number(event.target.value)
+                setYear(nextYear)
+                if (!isPeriodAllowed(nextYear, month)) setMonth(MIN_MONTH)
+              }}
+            >
+              {Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, index) => MIN_YEAR + index).map(
+                (value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ),
+              )}
+            </select>
+            <select
+              className="select"
+              value={month}
+              onChange={(event) => setMonth(Number(event.target.value))}
+            >
+              {MONTH_NAMES.map((name, index) => {
+                const value = index + 1
+                return (
+                  <option key={name} value={value} disabled={!isPeriodAllowed(year, value)}>
+                    {name}
+                  </option>
+                )
+              })}
+            </select>
+            <button
+              className="nav-btn"
+              type="button"
+              aria-label="Следующий месяц"
+              disabled={!canGoNext}
+              onClick={() => go(1)}
+            >
+              ›
+            </button>
+          </div>
+        ) : (
+          <h1 className="header__title">Покупка недвижимости</h1>
+        )}
       </header>
 
       <main className="main">
-        {data ? (
+        {page === 'property' ? (
+          <PropertyPage />
+        ) : data ? (
           <MonthView data={data} period={periodKey(year, month)} />
         ) : (
           <div className="empty panel">

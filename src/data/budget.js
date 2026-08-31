@@ -28,8 +28,10 @@ export const GROUPS = {
   leisure: { label: 'Досуг', color: '#0f9ea8' },
 }
 
+export const FAMILY_INCOME = 340_000
+
 const september2026 = {
-  income: 340_000,
+  income: FAMILY_INCOME,
   savings: 40_000,
   items: [
     {
